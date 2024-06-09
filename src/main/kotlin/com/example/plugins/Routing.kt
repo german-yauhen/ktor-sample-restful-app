@@ -1,10 +1,12 @@
 package com.example.plugins
 
 import com.example.model.Priority
+import com.example.model.Task
 import com.example.model.TaskRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.thymeleaf.*
@@ -38,8 +40,8 @@ fun Application.configureRouting() {
                 }
                 call.respond(
                     ThymeleafContent(
-                        template = "all-tasks",
-                        model = mapOf("tasks" to listOf(task))
+                        template = "single-task",
+                        model = mapOf("task" to task)
                     )
                 )
             }
@@ -57,17 +59,35 @@ fun Application.configureRouting() {
                 val tasks = TaskRepository.withPriority(priority)
                 call.respond(
                     ThymeleafContent(
-                        template = "all-tasks",
+                        template = "tasks-by-priority",
                         model = mapOf("tasks" to tasks)
                     )
                 )
             }
 
-//            post("/creation") {
-//                val task = call.receive<Task>()
-//                TaskRepository.add(task)
-//                call.respondRedirect("/tasks")
-//            }
+            post("/creation") {
+                val formContent = call.receiveParameters()
+                val params = Triple(
+                    formContent["name"] ?: "",
+                    formContent["description"] ?: "",
+                    formContent["priority"] ?: ""
+                )
+                if (params.toList().any { it.isEmpty() }) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@post
+                }
+                val priority = Priority.valueOf(params.third)
+                val task = Task(params.first, params.second, priority)
+                try {
+                    TaskRepository.add(task)
+                    val tasks = TaskRepository.allTasks()
+                    call.respond(
+                        ThymeleafContent("all-tasks", mapOf("tasks" to tasks))
+                    )
+                } catch (exc: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
+            }
         }
     }
 

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adding a new task</title>
+</head>
+<body>
+<h1>Adding a new task</h1>
+<form id="newtask">
+    <div>
+        <label for="name">Name: </label>
+        <input type="text" id="name" name="name" size="10">
+    </div>
+    <div>
+        <label for="description">Description: </label>
+        <input type="text" id="description" name="description" size="20">
+    </div>
+    <div>
+        <label for="priority">Priority: </label>
+        <select id="priority" name="priority">
+            <option name="Low">Low</option>
+            <option name="Medium">Medium</option>
+            <option name="High">High</option>
+            <option name="Vital">Vital</option>
+        </select>
+    </div>
+    <button type="submit">Submit</button>
+</form>
+<script type="application/javascript">
+    function sendPostToCreateNewTask(event) {
+        event.preventDefault()
+        let formData = new FormData(event.target);
+        let task = Object.fromEntries(formData.entries());
+        let taskJson = JSON.stringify(task);
+        fetch("/tasks/creation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: taskJson,
+                redirect: "follow"
+            },
+        ).then(rs => {
+            if (rs.redirected) {
+                window.location.href = rs.url
+            }
+        })
+    }
+
+    const form = document.getElementById("newtask")
+    if (form) {
+        form.addEventListener("submit", sendPostToCreateNewTask)
+    }
+</script>
+</body>
+</html>

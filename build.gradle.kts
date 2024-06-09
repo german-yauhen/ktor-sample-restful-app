@@ -23,16 +23,12 @@ repositories {
 
 dependencies {
     implementation("io.ktor:ktor-server-core")
-    implementation("io.ktor:ktor-server-content-negotiation")
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
     implementation("io.ktor:ktor-server-host-common")
     implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-server-thymeleaf")
     implementation("ch.qos.logback:logback-classic:$logback_version")
 
     testImplementation("io.ktor:ktor-server-tests")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("io.ktor:ktor-client-content-negotiation")
-//    testImplementation("io.ktor:ktor-server-content-negotiation")
-//    testImplementation("io.ktor:ktor-serialization-jackson")
-    testImplementation("com.jayway.jsonpath:json-path:2.9.0")
 }
